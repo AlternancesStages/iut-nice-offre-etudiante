@@ -156,7 +156,7 @@ def build_runtime_config_from_rows(rows):
     lba_job_names = {}
 
     for row in rows:
-        code = get_row_value_with_fallbacks(row, ["Code"]).strip()
+        code = get_row_value_with_fallbacks(row, ["Code"]).strip().upper()
         nom = get_row_value_with_fallbacks(row, ["Nom"]).strip()
         active = get_row_value_with_fallbacks(row, ["Activé", "Active", "Actif"])
 
