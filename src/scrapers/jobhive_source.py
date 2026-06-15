@@ -379,6 +379,19 @@ def main() -> None:
         domaines_actifs,
     )
 
+    # Sélection du sous-ensemble d'ATS à traiter (matrice GitHub Actions ou exécution complète)
+    ats_group_env = os.environ.get("JOBHIVE_ATS_GROUP", "").strip()
+    if ats_group_env:
+        ats_requested = [a.strip() for a in ats_group_env.split(",") if a.strip()]
+        active_ats = [a for a in ats_requested if a in TARGET_ATS]
+        unknown = [a for a in ats_requested if a not in TARGET_ATS]
+        if unknown:
+            logger.warning("ATS inconnus ignorés : %s", unknown)
+        logger.info("Groupe ATS sélectionné via JOBHIVE_ATS_GROUP : %s", active_ats)
+    else:
+        active_ats = list(TARGET_ATS)
+        logger.info("Aucun groupe ATS défini, traitement de tous les ATS (%d).", len(active_ats))
+
     try:
         from jobhive.client import Client
         c = Client()
@@ -392,7 +405,7 @@ def main() -> None:
 
     # ─── Chargement Tranche par Tranche ──────────────────────────────────────
     start()
-    for ats in TARGET_ATS:
+    for ats in active_ats:
         logger.info("Téléchargement de la tranche ATS : %s …", ats)
         t0 = time.time()
         try:

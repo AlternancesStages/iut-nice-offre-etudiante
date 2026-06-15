@@ -87,7 +87,7 @@ jobs:
   jobhive:
     name: Collecte JobHive
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 120
 
     env:
       GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
@@ -132,6 +132,7 @@ jobs:
         with:
           name: jobhive-exports
           path: exports/*.xlsx
+
 
   fusion-export:
     name: Fusion et Exportation
