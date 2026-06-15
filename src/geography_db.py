@@ -221,6 +221,41 @@ CITY_GEOGRAPHY = {
         "lng": 101.5185,
         "label": "Shah Alam (Malaisie)"
     },
+    "alameda": {
+        "lat": 49.2646,
+        "lng": -102.2825,
+        "label": "Alameda (Canada)"
+    },
+    "cebu-city": {
+        "lat": 10.3167,
+        "lng": 123.8907,
+        "label": "Cebu City (Philippines)"
+    },
+    "atlanta": {
+        "lat": 33.749,
+        "lng": -84.388,
+        "label": "Atlanta (États-Unis)"
+    },
+    "bristol": {
+        "lat": 51.4545,
+        "lng": -2.5879,
+        "label": "Bristol (Royaume-Uni)"
+    },
+    "riyadh": {
+        "lat": 24.7136,
+        "lng": 46.6753,
+        "label": "Riyadh (Arabie saoudite)"
+    },
+    "saint-vulbas": {
+        "lat": 45.834,
+        "lng": 5.293,
+        "label": "Saint-Vulbas (France)"
+    },
+    "montagny-les-beaune": {
+        "lat": 46.99,
+        "lng": 4.85,
+        "label": "Montagny-lès-Beaune (France)"
+    },
     "barentin": {
         "lat": 49.544169,
         "lng": 0.949823,
