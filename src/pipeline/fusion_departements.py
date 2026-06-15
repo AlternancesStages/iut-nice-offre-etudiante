@@ -100,8 +100,12 @@ def fusionner_departement(departement, file_path):
 
     dataframes = []
 
+    all_sheet_names = list(sheets.keys())
+    logger.info("  Feuilles trouvées dans %s : %s", file_path, all_sheet_names)
+
     for sheet_name, df in sheets.items():
         if sheet_name not in SOURCES:
+            logger.warning("  Feuille IGNOREE (absente de SOURCES) : '%s'", sheet_name)
             continue
 
         # Chaque feuille correspond à une source de collecte.
