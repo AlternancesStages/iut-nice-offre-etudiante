@@ -1209,7 +1209,13 @@ def check_is_abroad_offer(localisation):
         return True
     return False
 
+_GEOCODING_API_BLOCKED = False
+
 def geocode_city_api(city_raw):
+    global _GEOCODING_API_BLOCKED
+    if _GEOCODING_API_BLOCKED:
+        return None
+
     cleaned = clean_city_name_geo(city_raw)
     if not cleaned:
         return None
@@ -1219,8 +1225,9 @@ def geocode_city_api(city_raw):
     try:
         import urllib.request
         import urllib.parse
+        import urllib.error
         import json
-        import time
+        
         if is_abroad:
             query = city_raw
             url = f"https://nominatim.openstreetmap.org/search?q={urllib.parse.quote(query)}&format=json&limit=1"
@@ -1248,6 +1255,18 @@ def geocode_city_api(city_raw):
                 "lat": lat,
                 "lng": lng
             }
+            
+        # Si la requete reussit mais sans resultat, on retourne une structure vide pour le cache negatif
+        return {
+            "lat": None,
+            "lng": None
+        }
+    except urllib.error.HTTPError as e:
+        if e.code == 429:
+            print(f"Rate limit geocoding API (429) pour {city_raw}. Desactivation de la geolocalisation externe pour cette execution.")
+            _GEOCODING_API_BLOCKED = True
+        else:
+            print(f"HTTP Error {e.code} geocoding {city_raw} via API: {e.reason}")
     except Exception as e:
         print(f"Error geocoding {city_raw} via API: {e}")
     return None
@@ -1261,7 +1280,7 @@ def get_city_coordinates(localisation):
     if not slug:
         return None, None
         
-    # 1. Check static geography DB
+    # 1. Verification base de geographie statique
     try:
         from src.geography_db import CITY_GEOGRAPHY
         if slug in CITY_GEOGRAPHY:
@@ -1269,19 +1288,19 @@ def get_city_coordinates(localisation):
     except Exception:
         pass
         
-    # 2. Check persistent cache
+    # 2. Verification cache persistant (y compris les resultats vides mis en cache negatif)
     cache = load_geo_cache()
     if slug in cache:
-        return cache[slug]["lat"], cache[slug]["lng"]
+        return cache[slug].get("lat"), cache[slug].get("lng")
         
-    # 3. Request external API
+    # 3. Requete API externe
     coords = geocode_city_api(localisation)
-    if coords:
-        import time
+    if coords is not None:
         cache[slug] = coords
         save_geo_cache(cache)
-        # Sleep to respect rate limits
+        # On attend un peu pour respecter les limites de requetes si l'API fonctionne
+        import time
         time.sleep(1.0)
-        return coords["lat"], coords["lng"]
+        return coords.get("lat"), coords.get("lng")
         
     return None, None
