@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   legal-sources:
-    name: Sources legales (${{ matrix.group }})
+    name: Sources legales (${{ matrix.nom }})
     runs-on: ubuntu-latest
 
     strategy:
@@ -19,13 +19,17 @@ jobs:
       matrix:
         include:
           - group: france-travail
-            sources: API France Travail
+            sources: France Travail API
+            nom: API France Travail
           - group: la-bonne-alternance
             sources: La Bonne Alternance
+            nom: La Bonne Alternance
           - group: pass-fonction-publique
             sources: PASS Fonction publique
+            nom: PASS Fonction publique
           - group: cea
-            sources: Flux RSS CEA Emploi
+            sources: CEA Emploi RSS
+            nom: Flux RSS CEA Emploi
 
     env:
       FRANCE_TRAVAIL_CLIENT_ID: ${{ secrets.FRANCE_TRAVAIL_CLIENT_ID }}
