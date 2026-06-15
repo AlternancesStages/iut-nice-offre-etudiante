@@ -45,6 +45,14 @@ jobs:
       - name: Recuperer le code du depot
         uses: actions/checkout@v4
 
+      - name: Mettre en cache le fichier de geocodage
+        uses: actions/cache@v4
+        with:
+          path: exports/geocoding_cache.json
+          key: geocoding-cache-${{ github.run_id }}
+          restore-keys: |
+            geocoding-cache-
+
       - name: Configurer Python
         uses: actions/setup-python@v5
         with:
@@ -85,6 +93,14 @@ jobs:
     steps:
       - name: Recuperer le code du depot
         uses: actions/checkout@v4
+
+      - name: Mettre en cache le fichier de geocodage
+        uses: actions/cache@v4
+        with:
+          path: exports/geocoding_cache.json
+          key: geocoding-cache-${{ github.run_id }}
+          restore-keys: |
+            geocoding-cache-
 
       - name: Configurer Python
         uses: actions/setup-python@v5
