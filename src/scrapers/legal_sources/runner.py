@@ -202,7 +202,7 @@ def build_runtime_config_from_rows(rows):
         # On ne conserve du code local que la configuration des études (non présente dans Google Sheet).
         # Les compétences, mots-clés et exclusions proviennent exclusivement du Google Sheet pour éviter tout conflit.
         base_config = {
-            "nom_export": code.lower(),
+            "nom_export": DEFAULT_CONFIGS.get(code, {}).get("nom_export", code.lower()),
             "etudes": DEFAULT_CONFIGS.get(code, {}).get("etudes", {}),
             "competences": {},
             "keywords": [],
