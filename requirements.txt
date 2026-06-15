@@ -1,0 +1,11 @@
+
+pandas
+gspread
+google-auth
+openpyxl
+requests
+feedparser
+pytest
+sentence-transformers
+ijson
+git+https://github.com/kalil0321/ats-scrapers.git

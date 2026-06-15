@@ -1,0 +1,1 @@
+"""Collecteurs par source legale."""

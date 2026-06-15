@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+@theme {
+  --color-blue-400: #00afda;
+  --color-blue-500: #00afda;
+  --color-red-500: #e5005b;
+  --color-teal-500: #00afda;
+  --color-magenta-500: #d8005e;
+  --color-plum-500: #4b192f;
+  --font-sans: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  font-size: 110%;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #1e293b;
+}
+
+body {
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-family: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+}
+
+@keyframes tabSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-tabTransition {
+  animation: tabSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.custom-scrollbar::-webkit-scrollbar,
+.custom-map-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track,
+.custom-map-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.custom-map-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.custom-map-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(229, 0, 91, 0.4);
+  border-color: rgba(229, 0, 91, 0.2);
+}
+
+.custom-leaflet-tooltip {
+  background: #e5005b !important;
+  border: 1px solid rgba(229, 0, 91, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(229, 0, 91, 0.25) !important;
+  border-radius: 8px !important;
+}
+
+.custom-leaflet-tooltip::before {
+  border-top-color: #e5005b !important;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(229, 0, 91, 0.7);
+  }
+  70% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 10px rgba(229, 0, 91, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(229, 0, 91, 0);
+  }
+}
+
+.pulse-ring {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* Badges personnalisés selon les couleurs officielles demandées */
+.badge-stage {
+  background-color: rgba(249, 176, 0, 0.08) !important;
+  color: #b88200 !important;
+  border-color: rgba(249, 176, 0, 0.25) !important;
+}
+
+.badge-alternance {
+  background-color: rgba(149, 193, 31, 0.08) !important;
+  color: #556e11 !important;
+  border-color: rgba(149, 193, 31, 0.25) !important;
+}
+
+/* Barre de défilement horizontale personnalisée et élégante */
+.custom-horizontal-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
+.custom-horizontal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+}
+.custom-horizontal-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+}
+.custom-horizontal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #00afda;
+}
+
+/* Media query custom pour le header (passage en ligne uniquement >= 1555px) */
+@media (min-width: 1555px) {
+  .header-responsive-container {
+    flex-direction: row !important;
+  }
+  .header-responsive-logo {
+    width: auto !important;
+    justify-content: flex-start !important;
+    flex: none !important;
+  }
+  .header-responsive-tabs-wrapper {
+    width: auto !important;
+    flex: 1 1 0% !important;
+  }
+  .header-responsive-nav {
+    justify-content: center !important;
+  }
+  .header-responsive-balance {
+    display: block !important;
+    flex: none !important;
+  }
+}
