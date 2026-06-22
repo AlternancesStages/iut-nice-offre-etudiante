@@ -74,6 +74,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          python patch_jobhive.py
 
       - name: Collecter les sources legales
         run: python -u -m src.scrapers.legal_sources_all
@@ -123,6 +124,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          python patch_jobhive.py
 
       - name: Collecter les offres JobHive
         run: python -u -m src.scrapers.jobhive_source
@@ -179,6 +181,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          python patch_jobhive.py
 
       - name: Fusionner les exports des sources
         run: python -u -m src.pipeline.merge_artifacts
