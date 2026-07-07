@@ -1,165 +1,126 @@
 # Portail des Stages & Alternances | IUT de Nice
 
-Ce projet centralise, traite, filtre et affiche les offres de stages et d'alternances pour les étudiants de l'IUT de Nice Côte d'Azur. Il est composé de deux briques principales :
-1. **Un pipeline d'agrégation & scraping (Python)** : S'exécute de manière planifiée via GitHub Actions pour récolter les offres depuis plusieurs API et sources nationales/internationales.
-2. **Un portail web utilisateur (Next.js)** : Une interface moderne, fluide ("Soft UI") et cartographique permettant aux étudiants de visualiser, chercher et filtrer les offres pertinentes.
+Ce document explique le fonctionnement et l'utilisation du système de collecte et de diffusion des offres de stages et d'alternances pour l'IUT de Nice Côte d'Azur. 
+
+Ce système a été conçu pour être entièrement gérable par les responsables pédagogiques via un fichier Google Sheets, sans aucune manipulation technique requise au quotidien.
 
 ---
 
-## Liens Utiles
+## Liens d'accès rapides
 
-*   **Interface Web (Next.js) :** [iut-nice-offre-etudiante.vercel.app](https://iut-nice-offre-etudiante.vercel.app/)
-*   **Feuille Google Sheets de Configuration :** [CONFIG_FORMATIONS](https://docs.google.com/spreadsheets/d/1-Ffp3EySaDaH2vi41esyxUBAAARoH0pZQUVyz-A7WO0/edit?gid=1180575126#gid=1180575126)
-
----
-
-## Architecture du Projet
-
-Le dépôt est structuré comme suit :
-*   `src/` : Code source du pipeline d'agrégation Python.
-    *   `src/scrapers/` : Modules de collecte (France Travail, La Bonne Alternance, PASS, CEA RSS, JobHive ATS scraper).
-    *   `src/pipeline/` : Fusion des exports, application des filtres métiers, déduplication et export vers Google Sheets.
-    *   `src/config.py` : Configuration de fallback locale pour les départements (BUT).
-    *   `src/utils.py` : Fonctions utilitaires de filtrage, parsing de compétences et normalisation de dates.
-*   `nextjs-portal/` : Portail frontend Next.js en React / TailwindCSS.
-*   `.github/workflows/` : Pipeline d'intégration et déploiement continu (GitHub Actions) exécuté quotidiennement pour actualiser les offres.
+* Le Portail Web (Étudiants) : [iut-nice-offre-etudiante.vercel.app](https://iut-nice-offre-etudiante.vercel.app/)
+* Le Tableau de Configuration (Enseignants) : [CONFIG_FORMATIONS](https://docs.google.com/spreadsheets/d/1-Ffp3EySaDaH2vi41esyxUBAAARoH0pZQUVyz-A7WO0/edit?gid=1180575126#gid=1180575126)
+* Le Code Source (GitHub) : [github.com/timeogueusquin/iut-nice-offre-etudiante](https://github.com/timeogueusquin/iut-nice-offre-etudiante)
+* La Console d'exécution automatique (GitHub Actions) : [github.com/timeogueusquin/iut-nice-offre-etudiante/actions](https://github.com/timeogueusquin/iut-nice-offre-etudiante/actions)
 
 ---
 
-## Configuration des Formations (Google Sheets)
+## Comment fonctionne le système (en 3 étapes)
 
-Le pipeline de scraping s'appuie sur la feuille Google Sheets **`CONFIG_FORMATIONS`** pour filtrer précisément les offres de chaque département (BUT). Chaque ligne représente un département de l'IUT.
+Le fonctionnement est entièrement automatisé et suit un cycle quotidien :
 
-### Description des Colonnes
-
-| Colonne | Rôle | Format & Exemple |
-| :--- | :--- | :--- |
-| **Code** | Code du BUT (identifiant unique). *Ne pas modifier.* | `SD`, `INFO`, `GEA`, `CS`... |
-| **Nom** | Nom complet du département. | `Science des Données` |
-| **Codes ROME** | Codes métiers officiels pour interroger France Travail et LBA. | `M1801, M1802, M1805` *(séparés par des virgules)* |
-| **Mots exclus titre** | Rejette immédiatement l'offre si un de ces termes figure dans le titre. | `commercial, vente, manager` *(séparés par des virgules)* |
-| **Compétences** | Compétences techniques attendues et mots-clés associés. | `Python: python, pandas; SQL: sql, postgres` *(catégories séparées par des points-virgules `;`)* |
-| **Compétences exigées** | Nombre minimal de catégories de compétences distinctes requises (défaut = `2`). | `2` *(nombre entier)* |
-| **Mots clés titre** | Mots-clés spécifiques devant figurer dans le titre de l'offre. | `data, analyst, statistique` *(séparés par des virgules)* |
-| **Mots clés titre exigés**| Nombre minimal de mots-clés du titre requis (défaut = `0`). | `1` *(si > 0, désactive le fallback sémantique)* |
-| **Mots clés description**| Mots-clés requis ou recherchés dans la description de l'offre. | `analytics, dataviz` *(séparés par des virgules)* |
-| **Mots clés description exigés**| Nombre de mots-clés de description requis (défaut = `0`). | `1` *(nombre entier)* |
-| **Activé** | Indique si le département doit être collecté. | `oui`, `active`, `1` |
-
-> [!TIP]
-> **Robustesse du Parser de Compétences** : Le délimiteur standard des catégories de compétences est le point-virgule (`;`). Cependant, le parseur a été amélioré pour supporter également les séparateurs de type virgule (`,`) sans bloquer ou fausser la classification.
+1. **Configuration** : Les responsables pédagogiques définissent les critères de recherche de leur département dans le fichier Google Sheets (mots-clés, compétences, exclusions).
+2. **Collecte automatique** : Chaque nuit, un programme s'exécute automatiquement dans le cloud. Il interroge les plateformes partenaires (France Travail, La Bonne Alternance, le CEA, le PASS Fonction Publique et JobHive), filtre les offres selon vos critères et les trie.
+3. **Mise en ligne** : Les offres validées sont écrites dans l'onglet correspondant du Google Sheets, puis s'affichent instantanément sur le Portail Web destiné aux étudiants.
 
 ---
 
-## Fonctionnalités Avancées de Filtrage & Traitement
+## Guide pratique pour le responsable de formation
 
-1. **Matching Sémantique (Fallback)** :
-   * Si les exigences de mots-clés titre/description sont définies à `0` et qu'aucun mot-clé exact n'est trouvé, le pipeline déclenche un **modèle d'embedding sémantique** (`sentence-transformers`) pour évaluer si l'offre est tout de même pertinente par rapport aux concepts métiers du BUT.
+Pour ajuster les offres reçues par vos étudiants, vous devez uniquement intervenir dans la feuille **CONFIG_FORMATIONS** du Google Sheets.
 
-2. **Traduction & Support Bilingue Automatique** :
-   * Le pipeline intègre un dictionnaire de traduction bidirectionnel en mémoire. Si un mot-clé ou une compétence est configuré en français, le scraper recherchera également sa traduction anglaise équivalente (et vice-versa), éliminant le besoin de doubler les mots-clés manuellement dans la configuration.
-   * La détection des durées de contrat est également bilingue (ex : *3 to 6 months* $\rightarrow$ `3 à 6 mois`).
+### Comment modifier les critères de votre BUT
 
-3. **Protection Anti-Pollution pour Carrières Sociales (CS)** :
-   * Pour éviter que les étudiants de CS ne soient pollués par des opportunités de marketing/communication ou RH, un filtre Step 0a rejette automatiquement les termes liés au commercial, au recrutement ou au social media.
+Chaque ligne représente un département de l'IUT (SD, INFO, GEA, CS...). Vous pouvez modifier les colonnes suivantes :
 
-4. **Filtre & Localisation "À l'étranger"** :
-   * Les offres internationales récoltées par JobHive (ATS) sont classées séparément et formatées sous la forme `"Ville (Pays)"` (ex: `"Munich (Allemagne)"`, `"Londres (Royaume-Uni)"`).
-   * Dans l'interface web, un bouton à glissière permet de filtrer pour afficher uniquement les offres basées hors de France.
+* **Codes ROME** : Indiquez les codes métiers officiels (ex: `M1801, M1805`) séparés par des virgules pour cibler les offres de France Travail.
+* **Mots exclus titre** : Mots-clés qui rejettent immédiatement une offre si présents dans le titre (ex: `commercial, manager`). Utile pour éliminer les hors-sujets.
+* **Compétences** : Les compétences attendues structurées par catégories (ex: `Python: python, pandas; SQL: sql, postgres`). Utilisez des points-virgules pour séparer les catégories.
+* **Compétences exigées** : Nombre minimum de compétences distinctes que l'étudiant doit posséder parmi votre liste pour que l'offre soit retenue (valeur par défaut : 2).
+* **Mots clés titre** : Termes obligatoires dans le titre de l'offre (ex: `data, analyst`). Si cette colonne est vide (0 requis), le système utilise une recherche par similarité de sens.
+* **Mots clés description** : Termes recherchés dans le texte de la description.
+* **Activé** : Indiquez `oui` pour que le système cherche des offres pour votre département, ou `non` pour le désactiver.
 
----
+### Fonctionnalités intelligentes intégrées
 
-## Interface Utilisateur (Next.js)
-
-L'application web est construite sous Next.js avec un design **"Soft UI"** moderne, fluide et responsive.
-
-*   **Filtres temporels BUT** :
-    *   **BUT 2** : Cible les stages d'une durée de **8 à 20 semaines**.
-    *   **BUT 3** : Cible les alternances de **1 an et plus**.
-*   **Visualisation Cartographique** : Une carte Leaflet affiche en temps réel les offres géolocalisées. Les coordonnées géographiques des villes sont pré-chargées statiquement pour éliminer tout temps de latence ou erreur de quota (HTTP 429).
-*   **Répartition Statistique** : Des graphiques interactifs (par source, par type de contrat, et répartition France / Étranger) aident à analyser le marché en temps réel.
-*   **Déduplication Intelligente** : Les doublons sont filtrés automatiquement côté client par comparaison de lien direct ou normalisation agressive du titre et du nom de l'entreprise.
-*   **Export Excel / CSV** : Un bouton permet d'exporter le tableau des offres filtrées au format CSV standardisé (séparateur `;` avec BOM UTF-8 pour une intégration native sous Excel).
+* **Traduction automatique** : Il est inutile de doubler vos mots-clés en anglais. Si vous configurez "données", le système cherchera aussi "data". Si vous configurez "developer", il cherchera aussi "développeur".
+* **Recherche sémantique par intelligence artificielle** : Si une offre ne contient pas vos mots-clés exacts mais traite précisément du sujet de votre formation (par exemple une offre rédigée avec des synonymes), le système évalue le sens général du texte et retient l'offre si elle correspond à votre profil de formation.
+* **Filtre spécifique pour Carrières Sociales (CS)** : Un filtre renforcé élimine automatiquement les offres de communication, de marketing ou de ressources humaines qui polluent souvent les recherches dans ce domaine.
+* **Gestion des offres à l'étranger** : Le système identifie automatiquement les offres internationales issues des grands groupes technologiques, les formate (ex: "Londres (Royaume-Uni)") et permet aux étudiants de les filtrer d'un simple clic sur le portail.
 
 ---
 
-## Variables d'Environnement
+## Guide d'utilisation du Portail Étudiant
 
-Pour faire fonctionner le projet, configurez les variables d'environnement suivantes :
+Le Portail Web offre une interface épurée et facile à prendre en main par les étudiants :
 
-### Backend (Python Pipeline)
-
-Créez un fichier `.env` à la racine :
-
-```env
-# Authentification Google Sheets
-GOOGLE_SHEET_ID="votre_sheet_id_ici"
-GOOGLE_APPLICATION_CREDENTIALS="chemin/vers/votre/credentials.json"
-# Ou passez le JSON directement en base64 :
-# GOOGLE_CREDENTIALS_B64="votre_json_b64"
-
-# Configuration des API de Collecte
-FRANCE_TRAVAIL_CLIENT_ID="votre_client_id"
-FRANCE_TRAVAIL_CLIENT_SECRET="votre_client_secret"
-LBA_API_TOKEN="votre_lba_token"
-
-# Options
-USE_GOOGLE_FORMATION_CONFIG="1"
-```
-
-### Frontend (Next.js)
-
-Créez un fichier `nextjs-portal/.env.local` :
-
-```env
-GOOGLE_SHEET_ID="votre_sheet_id_ici"
-GOOGLE_SERVICE_ACCOUNT='{"type": "service_account", "project_id": ...}'
-```
-
----
-
-## Démarrage Local
-
-### 1. Lancement du Pipeline de Scraping
-
-```bash
-# 1. Créer un environnement virtuel et l'activer
-python -m venv venv
-venv\Scripts\activate # Sur Windows
-# source venv/bin/activate # Sur macOS/Linux
-
-# 2. Installer les dépendances
-pip install -r requirements.txt
-
-# 3. Lancer la collecte globale (sources légales + JobHive)
-python -m src.scrapers.legal_sources_all
-python -m src.scrapers.jobhive_source
-
-# 4. Exécuter la fusion et l'export final vers Google Sheets
-python -m src.pipeline.merge_artifacts
-python -m src.pipeline.fusion_departements
-python -m src.pipeline.export
-```
-
-### 2. Lancement du Portail Web
-
-```bash
-cd nextjs-portal
-
-# 1. Installer les dépendances
-npm install
-
-# 2. Lancer le serveur de développement
-npm run dev
-```
-
-Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur.
+* **Filtres de niveau d'études** :
+    * Le bouton **BUT 2** filtre automatiquement pour afficher les stages d'une durée de 8 à 20 semaines.
+    * Le bouton **BUT 3** filtre automatiquement pour afficher les alternances d'un an ou plus.
+* **Carte interactive** : Affiche les offres sur une carte de France pour faciliter la recherche par zone géographique.
+* **Export de données** : Les étudiants peuvent exporter d'un seul clic leur sélection d'offres sous format CSV pour l'ouvrir dans Excel.
+* **Moteur de recherche intelligent** : Recherche floue qui tolère les fautes d'orthographe ou les abréviations.
 
 ---
 
 ## Règles d'or pour la maintenance du Google Sheet
 
-*   **Ne pas supprimer** ni renommer les colonnes de la feuille `CONFIG_FORMATIONS`.
-*   **Ne pas modifier** les codes de formation (`SD`, `INFO`...) sous peine de casser les liaisons.
-*   N'utilisez pas de mots trop généraux comme `assistant`, `projet` ou `stage` dans les mots-clés.
-*   En cas de problème d'encodage console (notamment sous Windows), le script Python configure automatiquement la sortie standard en UTF-8.
+Pour éviter de bloquer l'exécution automatique nocturne :
+
+* **Ne jamais supprimer ou renommer les colonnes** de la feuille `CONFIG_FORMATIONS`.
+* **Ne jamais modifier les codes de département** (`SD`, `INFO`...) de la première colonne.
+* Évitez d'utiliser des mots-clés trop généraux comme `stage`, `alternance`, `projet` ou `assistant` qui risquent d'importer des milliers d'offres hors-sujet.
+
+---
+
+<details>
+<summary><b>Informations techniques pour les développeurs (Lancement local)</b></summary>
+
+### Configuration des Variables d'environnement
+
+Pour que le pipeline s'exécute automatiquement sur GitHub Actions, vous devez renseigner ces variables dans les paramètres de votre dépôt GitHub (onglet **Settings** > **Secrets and variables** > **Actions** > **New repository secret**) :
+
+#### Secrets à configurer dans GitHub (Production)
+*   `GOOGLE_SHEET_ID` : L'identifiant unique de la feuille de calcul Google Sheets. **Format** : Une chaîne de caractères de 44 caractères, visible dans l'adresse URL de votre feuille (ex: `1-Ffp3EySaDaH2vi...`).
+*   `GOOGLE_CREDENTIALS_B64` : La clé d'accès (JSON) du compte de service Google encodée en base64 pour être collée sur une seule ligne. **Format** : Une longue chaîne de caractères se terminant parfois par `=` (ex: `ewogICJ0eXBlIjog...`).
+*   `FRANCE_TRAVAIL_CLIENT_ID` : L'identifiant client pour l'API France Travail (anciennement Pôle Emploi). **Format** : Une clé d'environ 60 caractères alphanumériques (ex: `CLT_a1b2c3d4...`).
+*   `FRANCE_TRAVAIL_CLIENT_SECRET` : La clé secrète associée au client de l'API France Travail. **Format** : Une chaîne de 64 caractères hexadécimaux.
+*   `LBA_API_TOKEN` : Le jeton de sécurité pour l'API La Bonne Alternance. **Format** : Une clé API sous forme de chaîne de caractères fournie après inscription.
+
+---
+
+#### Pour un lancement en local (Développement)
+Si vous souhaitez faire des tests en local sur votre machine, créez un fichier `.env` à la racine du projet avec ces valeurs :
+```env
+GOOGLE_SHEET_ID="votre_sheet_id"
+GOOGLE_APPLICATION_CREDENTIALS="chemin/vers/votre/credentials.json"
+FRANCE_TRAVAIL_CLIENT_ID="votre_id"
+FRANCE_TRAVAIL_CLIENT_SECRET="votre_secret"
+LBA_API_TOKEN="votre_token"
+USE_GOOGLE_FORMATION_CONFIG="1"
+```
+
+### Démarrage du pipeline Python
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+
+# Lancement des collecteurs et de la fusion
+python -m src.scrapers.legal_sources_all
+python -m src.scrapers.jobhive_source
+python -m src.pipeline.merge_artifacts
+python -m src.pipeline.fusion_departements
+python -m src.pipeline.export
+```
+
+### Démarrage du portail Next.js
+
+```bash
+cd nextjs-portal
+npm install
+npm run dev
+```
+
+</details>
