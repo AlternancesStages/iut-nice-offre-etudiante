@@ -81,6 +81,7 @@ Pour que le pipeline s'exécute automatiquement sur GitHub Actions, vous devez r
 #### Secrets à configurer dans GitHub (Production)
 *   `GOOGLE_SHEET_ID` : L'identifiant unique de la feuille de calcul Google Sheets. **Format** : Une chaîne de caractères de 44 caractères, visible dans l'adresse URL de votre feuille (ex: `1-Ffp3EySaDaH2vi...`).
 *   `GOOGLE_CREDENTIALS_B64` : La clé d'accès (JSON) du compte de service Google encodée en base64 pour être collée sur une seule ligne. **Format** : Une longue chaîne de caractères se terminant parfois par `=` (ex: `ewogICJ0eXBlIjog...`).
+*   https://console.cloud.google.com/apis/credentials?authuser=2&project=offres-etudiantes
 *   `FRANCE_TRAVAIL_CLIENT_ID` : L'identifiant client pour l'API France Travail (anciennement Pôle Emploi). **Format** : Une clé d'environ 60 caractères alphanumériques (ex: `CLT_a1b2c3d4...`).
 *   `FRANCE_TRAVAIL_CLIENT_SECRET` : La clé secrète associée au client de l'API France Travail. **Format** : Une chaîne de 64 caractères hexadécimaux.
 *   `LBA_API_TOKEN` : Le jeton de sécurité pour l'API La Bonne Alternance. **Format** : Une clé API sous forme de chaîne de caractères fournie après inscription.
