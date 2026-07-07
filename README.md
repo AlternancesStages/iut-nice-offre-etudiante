@@ -54,9 +54,7 @@ Chaque ligne représente un département de l'IUT (SD, INFO, GEA, CS...). Vous p
 
 Le Portail Web offre une interface épurée et facile à prendre en main par les étudiants :
 
-* **Filtres de niveau d'études** :
-    * Le bouton **BUT 2** filtre automatiquement pour afficher les stages d'une durée de 8 à 20 semaines.
-    * Le bouton **BUT 3** filtre automatiquement pour afficher les alternances d'un an ou plus.
+* **Filtres**
 * **Carte interactive** : Affiche les offres sur une carte de France pour faciliter la recherche par zone géographique.
 * **Export de données** : Les étudiants peuvent exporter d'un seul clic leur sélection d'offres sous format CSV pour l'ouvrir dans Excel.
 * **Moteur de recherche intelligent** : Recherche floue qui tolère les fautes d'orthographe ou les abréviations.
