@@ -773,4 +773,3 @@ export function getStandardCityKey(loc: string, geographyMap: { [key: string]: a
 
   return null;
 }
-
