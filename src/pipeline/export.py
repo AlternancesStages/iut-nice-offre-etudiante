@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 SERVICE_ACCOUNT_FILE = "credentials.json"
 
-GOOGLE_SHEET_ID = "1-Ffp3EySaDaH2vi41esyxUBAAARoH0pZQUVyz-A7WO0"
+GOOGLE_SHEET_ID = os.environ.get("GOOGLE_SHEET_ID", "1DNQZRR55YODMen7NSfEKrmGR9ygSd9yIda0S5-X-TVU")
 
 EXCEL_FILE = "exports/offres_fusion_par_departement.xlsx"
 
