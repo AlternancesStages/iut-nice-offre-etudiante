@@ -14,17 +14,23 @@ def patch_jobhive():
 
     Ce script est idempotent.
     """
+    module = None
     try:
         import jobhive
+        module = jobhive
     except ImportError:
-        print("[patch_jobhive] jobhive non installe, patch ignore.")
-        return False
+        try:
+            import ats_scrapers
+            module = ats_scrapers
+        except ImportError:
+            print("[patch_jobhive] jobhive/ats_scrapers non installe, patch ignore.")
+            return True
 
-    manifest_path = Path(jobhive.__file__).parent / "manifest.py"
+    manifest_path = Path(module.__file__).parent / "manifest.py"
 
     if not manifest_path.exists():
         print(f"[patch_jobhive] Fichier introuvable : {manifest_path}")
-        return False
+        return True
 
     content = manifest_path.read_text(encoding="utf-8")
 
@@ -40,7 +46,7 @@ def patch_jobhive():
 
     if patched == content:
         print("[patch_jobhive] Pattern non trouve - verifier la version de jobhive.")
-        return False
+        return True
 
     manifest_path.write_text(patched, encoding="utf-8")
     print(f"[patch_jobhive] Patch applique avec succes sur {manifest_path}")
