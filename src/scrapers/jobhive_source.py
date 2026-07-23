@@ -396,8 +396,12 @@ def main() -> None:
         from jobhive.client import Client
         c = Client()
     except ImportError:
-        logger.error("La bibliothèque `jobhive` n'est pas installée. Arrêt.")
-        return
+        try:
+            from ats_scrapers.client import Client
+            c = Client()
+        except ImportError:
+            logger.error("La bibliothèque `jobhive` (ou `ats-scrapers`) n'est pas installée. Arrêt.")
+            return
 
     # Dictionnaire de stockage final des offres filtrées par domaine
     jobs_by_domain: dict[str, list[dict]] = {d: [] for d in domaines_actifs}
